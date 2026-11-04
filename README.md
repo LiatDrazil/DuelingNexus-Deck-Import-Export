@@ -14,6 +14,26 @@ A Chrome/Edge (Manifest V3) extension that adds deck import and export to [Dueli
   - **Export** uses the deck exactly as shown on screen, including unsaved changes.
   - **Import** (Upload YDK / Omega code / YDKE URL) replaces the contents of the deck currently open. It asks for confirmation and can be undone with Undo. Nothing is saved until you click **Save**.
 
+## Screenshots
+
+### Deck list — regular site
+
+The export button is available on every deck. Its menu includes Download YDK, Omega code, and YDKE URL.
+
+![Deck list export menu on the regular Dueling Nexus site](docs/decks.png)
+
+### Deck list — beta site
+
+The same export options are available on the beta deck list.
+
+![Deck list export menu on the Dueling Nexus beta site](docs/decks-beta.png)
+
+### Deck editor
+
+The editor toolbar includes separate Import and Export buttons, each with the three supported formats.
+
+![Import and export menus in the Dueling Nexus deck editor](docs/editor.png)
+
 ## Installation
 
 1. Download or clone this repository.
