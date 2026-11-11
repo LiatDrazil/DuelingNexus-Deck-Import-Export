@@ -3,6 +3,9 @@
 
     const BTN_CLASS = "ydke-export-btn";
     const ICON_DOWNLOAD = "M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z";
+    const ICON_UPLOAD = "M9 16v-6H5l7-7l7 7h-4v6zm-4 4v-2h14v2z";
+    const ICON_OMEGA = "M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2a2 2 0 0 0 2-2V5h2V3m6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2a2 2 0 0 1-2-2V5h-2V3z";
+    const ICON_YDKE_LINK = "M10.59 13.41c.41.39.41 1.03 0 1.42c-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0a5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.98 2.98 0 0 0 0-4.24a2.98 2.98 0 0 0-4.24 0l-3.53 3.53a2.98 2.98 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0a5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.98 2.98 0 0 0 0 4.24a2.98 2.98 0 0 0 4.24 0l3.53-3.53a2.98 2.98 0 0 0 0-4.24a.973.973 0 0 1 0-1.42";
 
     function toBase64(ids) {
         const buffer = new ArrayBuffer(ids.length * 4);
@@ -30,20 +33,6 @@
         );
     }
 
-    // Current site (Vue 2): the deck list component is reachable from the root element.
-    function findDecksComponent() {
-        const root = document.getElementById("app");
-        const start = root && root.__vue__;
-        if (!start) return null;
-        const stack = [start];
-        while (stack.length) {
-            const vm = stack.pop();
-            if (Array.isArray(vm.decks) && typeof vm.retrieveDecks === "function") return vm;
-            if (vm.$children) stack.push(...vm.$children);
-        }
-        return null;
-    }
-
     let deckListCache = null;
     async function fetchDeckList() {
         if (deckListCache && Date.now() - deckListCache.time < 5000) return deckListCache.decks;
@@ -55,24 +44,17 @@
     }
 
     async function resolveDeck(actions, li) {
-        // Beta site (Vue 3): the actions component receives the deck as a prop.
+        // The current site passes the deck to its Vue 3 actions component.
         let inst = actions.__vueParentComponent;
         for (let i = 0; inst && i < 3; i++, inst = inst.parent) {
             if (inst.props && inst.props.deck) return inst.props.deck;
         }
 
-        const vm = findDecksComponent();
-        if (vm) {
-            const items = Array.from(document.querySelectorAll("li.deck-item"));
-            const deck = (vm.searchedDecks || vm.decks)[items.indexOf(li)];
-            if (deck) return deck;
-        }
-
-        // Fallback: ask the API and match by the editor link id, then by deck name.
+        // Fallback for when the deck isn't exposed on the component instance.
         const decks = await fetchDeckList();
         const hrefs = Array.from(li.querySelectorAll("a[href]")).map((a) => a.getAttribute("href"));
         for (const href of hrefs) {
-            const m = href.match(/(\d+)\/?(?:[?#].*)?$/);
+            const m = href.match(/([^/]+)\/?(?:[?#].*)?$/);
             const found = m && decks.find((d) => String(d.id) === m[1]);
             if (found) return found;
         }
@@ -153,8 +135,8 @@
 
     const OPTIONS = [
         { label: "Download YDK", icon: ICON_DOWNLOAD, viewBox: "0 0 24 24", run: async (deck) => downloadText((deck.name || "deck").replace(/[\\/:*?"<>|]/g, "_") + ".ydk", toYdk(deck)), done: "Downloaded!" },
-        { label: "Omega code", icon: "M8 3a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H3v2h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2v-2H8v-5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V5h2V3zm6 0a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1v2h-1a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2v-2h2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5h-2V3z", viewBox: "0 0 24 24", run: async (deck) => copyText(await toOmega(deck)), done: "Omega copied!" },
-        { label: "YDKE URL", icon: "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z", viewBox: "0 0 24 24", run: async (deck) => copyText(toYdke(deck)), done: "YDKE copied!" },
+        { label: "Omega code", icon: ICON_OMEGA, viewBox: "0 0 24 24", run: async (deck) => copyText(await toOmega(deck)), done: "Omega copied!" },
+        { label: "YDKE URL", icon: ICON_YDKE_LINK, viewBox: "0 0 24 24", run: async (deck) => copyText(toYdke(deck)), done: "YDKE copied!" },
     ];
 
     let openMenu = null;
@@ -168,43 +150,60 @@
 
     function showMenu(btn, options, getArg) {
         closeMenu();
+        const editorMenu = isEditorPage();
         const menu = document.createElement("div");
+        if (editorMenu) {
+            Object.assign(menu.style, {
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px",
+                minWidth: "190px",
+                padding: "6px",
+                background: "#111925",
+                border: "1px solid #777",
+                borderRadius: "3px",
+                boxShadow: "0 8px 24px rgba(0,0,0,.45)",
+            });
+        } else {
+            menu.className = "min-w-48 flex flex-col gap-1 p-1.5 rounded-xl border border-line-strong bg-ink-void shadow-lg";
+        }
         Object.assign(menu.style, {
             position: "fixed",
             zIndex: "2147483647",
-            display: "flex",
-            flexDirection: "column",
-            gap: "2px",
-            padding: "6px",
-            minWidth: "170px",
-            background: "#0b1120",
-            border: "1px solid #334155",
-            borderRadius: "10px",
-            boxShadow: "0 8px 24px rgba(0,0,0,.5)",
-            font: "600 13px/1 Inconsolata, monospace",
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
         });
 
         options.forEach((opt) => {
             const item = document.createElement("button");
             item.type = "button";
             item.innerHTML =
-                '<svg width="16" height="16" viewBox="' + opt.viewBox + '" fill="currentColor" style="flex:none"><path d="' + opt.icon + '"/></svg>';
+                '<svg width="16" height="16" viewBox="' + opt.viewBox + '" class="iconify iconify--mdi" style="flex:none"><path fill="currentColor" d="' + opt.icon + '"/></svg>';
             item.appendChild(document.createTextNode(opt.label));
-            Object.assign(item.style, {
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                textAlign: "left",
-                padding: "10px 12px",
-                color: "#e2e8f0",
-                background: "transparent",
-                borderRadius: "6px",
-                cursor: "pointer",
-            });
-            item.onmouseenter = () => (item.style.background = "#7e22ce");
-            item.onmouseleave = () => (item.style.background = "transparent");
+            if (editorMenu) {
+                Object.assign(item.style, {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    boxSizing: "border-box",
+                    width: "100%",
+                    height: "32px",
+                    margin: "2px 0",
+                    padding: "1px 8px",
+                    color: "#f0f0f0",
+                    background: "#111925",
+                    border: "1px solid #777",
+                    borderRadius: "0",
+                    fontFamily: '"Helvetica Neue", Helvetica, Verdana, Geneva, sans-serif',
+                    fontSize: "14px",
+                    fontWeight: "400",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    transition: "background 150ms ease",
+                });
+                item.onmouseenter = () => (item.style.background = "rgba(64, 64, 64, 0.8)");
+                item.onmouseleave = () => (item.style.background = "#111925");
+            } else {
+                item.className = "flex items-center gap-2 px-3 py-2 rounded-lg font-display text-ui font-bold tracking-wider uppercase text-gray-300 cursor-pointer transition duration-150 ease-out hover:bg-highlight/50 hover:text-paper";
+            }
             item.onclick = async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -236,30 +235,22 @@
         openMenu = menu;
     }
 
-    function addButton(del) {
-        const actions = del.parentElement;
-        const li = del.closest("li");
-        if (!actions || !li || actions.querySelector("." + BTN_CLASS)) return;
-        const copy = del.previousElementSibling;
-        if (!copy || copy.tagName !== "BUTTON") return;
+    function addButton(copyLink) {
+        const actions = copyLink.parentElement;
+        const li = copyLink.closest("li");
+        const moreActions = actions && actions.querySelector('button[aria-label^="More actions for "]');
+        if (!actions || !li || !moreActions || actions.querySelector("." + BTN_CLASS)) return;
 
-        const btn = copy.cloneNode(true);
+        const btn = copyLink.cloneNode(true);
         btn.classList.add(BTN_CLASS);
-        btn.classList.remove("text-green-400!");
-        btn.title = "Export";
-        btn.setAttribute("aria-label", "Export");
-        const label = btn.querySelector(".button-label");
-        if (label) label.textContent = "Export";
+        const deckName = (copyLink.getAttribute("aria-label") || "").replace(/^Copy link to\s*/, "");
+        btn.title = "Export " + deckName;
+        btn.setAttribute("aria-label", "Export " + deckName);
 
         const svg = btn.querySelector("svg");
         if (!svg) return;
         svg.setAttribute("viewBox", "0 0 24 24");
         svg.innerHTML = '<path fill="currentColor" d="' + ICON_DOWNLOAD + '"/>';
-
-        // The current site's button container is a fixed 3-column grid; make room for the 4th button.
-        if (actions.classList.contains("grid-cols-3")) {
-            actions.style.gridTemplateColumns = "repeat(4, auto)";
-        }
 
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -271,14 +262,13 @@
                 return deck;
             });
         });
-        actions.insertBefore(btn, del);
+        actions.insertBefore(btn, moreActions);
     }
 
     // ---------- Deck editor (/editor/<id>) ----------
 
-    const ICON_UPLOAD = "M5 20h14v-2H5v2zM9 16h6v-6h4l-7-7-7 7h4v6z";
-    const ICON_BRACES = OPTIONS[1].icon;
-    const ICON_LINK = OPTIONS[2].icon;
+    const ICON_BRACES = ICON_OMEGA;
+    const ICON_LINK = ICON_YDKE_LINK;
 
     function bytesToIds(bin) {
         const out = [];
@@ -477,8 +467,7 @@
 
     function scan() {
         ensureEditorButtons();
-        // The delete button is the only red button inside a deck card on both sites.
-        document.querySelectorAll('li button[class*="text-red-"]').forEach(addButton);
+        document.querySelectorAll('li button[aria-label^="Copy link to "]').forEach(addButton);
     }
 
     let scheduled = false;

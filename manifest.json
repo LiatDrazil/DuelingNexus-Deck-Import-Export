@@ -1,11 +1,11 @@
 ﻿{
   "manifest_version": 3,
   "name": "Dueling Nexus - Deck Import & Export",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Adds export (YDK / Omega / YDKE) to the Dueling Nexus deck list and export/import to the deck editor.",
   "content_scripts": [
     {
-      "matches": ["https://duelingnexus.com/*", "https://beta.duelingnexus.com/*"],
+      "matches": ["https://duelingnexus.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle",
       "world": "MAIN"

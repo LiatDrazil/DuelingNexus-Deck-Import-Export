@@ -1,12 +1,12 @@
 # Dueling Nexus - Deck Import & Export
 
-A Chrome/Edge (Manifest V3) extension that adds deck import and export to [Dueling Nexus](https://duelingnexus.com) and its [beta site](https://beta.duelingnexus.com).
+A Chrome/Edge (Manifest V3) extension that adds deck import and export to [Dueling Nexus](https://duelingnexus.com).
 
 > Unofficial, fan-made project. Not affiliated with or endorsed by Dueling Nexus.
 
 ## Features
 
-- **Deck list** (`/decks`, both the regular and beta sites): an export button on each deck with three options:
+- **Deck list** (`/decks`): an export button on each deck with three options:
   - **Download YDK** – saves a `.ydk` file
   - **Omega code** – copies an Omega code to the clipboard
   - **YDKE URL** – copies a `ydke://` URL to the clipboard
@@ -16,21 +16,15 @@ A Chrome/Edge (Manifest V3) extension that adds deck import and export to [Dueli
 
 ## Screenshots
 
-### Deck list — regular site
+### Deck list
 
-The export button is available on every deck. Its menu includes Download YDK, Omega code, and YDKE URL.
+The export button is placed alongside the site's existing deck actions. Its menu includes Download YDK, Omega code, and YDKE URL.
 
-![Deck list export menu on the regular Dueling Nexus site](docs/decks.png)
-
-### Deck list — beta site
-
-The same export options are available on the beta deck list.
-
-![Deck list export menu on the Dueling Nexus beta site](docs/decks-beta.png)
+![Dueling Nexus deck list with the extension's export menu](docs/decks.png)
 
 ### Deck editor
 
-The editor toolbar includes separate Import and Export buttons, each with the three supported formats.
+The editor toolbar provides separate Import and Export buttons, each with the three supported formats.
 
 ![Import and export menus in the Dueling Nexus deck editor](docs/editor.png)
 
@@ -44,7 +38,7 @@ The editor toolbar includes separate Import and Export buttons, each with the th
 
 ## Privacy
 
-The extension runs only on `duelingnexus.com` and `beta.duelingnexus.com`. It reads your decks through the site's own session and sends nothing to any third party.
+The extension runs only on `duelingnexus.com`. It reads your decks through the site's own session and sends nothing to any third party.
 
 ## Notes
 
