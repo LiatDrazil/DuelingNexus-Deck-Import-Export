@@ -13,6 +13,10 @@ A Chrome/Edge (Manifest V3) extension that adds deck import and export to [Dueli
 - **Deck editor** (`/editor/<id>`): **Import** and **Export** buttons in the toolbar.
   - **Export** uses the deck exactly as shown on screen, including unsaved changes.
   - **Import** (Upload YDK / Omega code / YDKE URL) replaces the contents of the deck currently open. It asks for confirmation and can be undone with Undo. Nothing is saved until you click **Save**.
+- **Replay list** (`/replays`): deck names and eye buttons keep the original gray color, with a bold **vs** separator.
+  - Click the button to open one panel showing Main Deck above Extra Deck, with actions to export as YDK / Omega / YDKE or add the deck to your Dueling Nexus account.
+  - Cards follow the deck editor's **Order** sort. Hover over a card to see its larger artwork; the full deck preview fits without internal scrolling on typical desktop screens.
+  - Replay data includes Main and Extra Deck cards; Side Deck cards are not available.
 
 ## Screenshots
 
@@ -28,6 +32,12 @@ The editor toolbar provides separate Import and Export buttons, each with the th
 
 ![Import and export menus in the Dueling Nexus deck editor](docs/editor.png)
 
+### Replay list
+
+Click the eye button next to a replay deck to open its preview and export or add the deck to your account. Hover over a card to view its enlarged artwork.
+
+![Replay deck preview with export actions and enlarged card artwork](docs/replays.png)
+
 ## Installation
 
 1. Download or clone this repository.
@@ -38,7 +48,7 @@ The editor toolbar provides separate Import and Export buttons, each with the th
 
 ## Privacy
 
-The extension runs only on `duelingnexus.com`. It reads your decks through the site's own session and sends nothing to any third party.
+The extension runs only on `duelingnexus.com`. Replay data and account actions use Dueling Nexus; card artwork in replay previews loads from the same public image host used by the site. No deck data is sent to third-party services.
 
 ## Notes
 
